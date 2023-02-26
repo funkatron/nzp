@@ -61,4 +61,15 @@ ClimatePlan.prototype.removeClimatePlanAction = function (climatePlanAction) {
     }
 }
 
-export { ClimatePlan };
+/**
+ * Serialize the ClimatePlan as a CSV string
+ */
+ClimatePlan.prototype.serializeAsCSV = function () {
+    let csv = "id,title,estYearlyReductionCO2Emissions,startYear,endYear\n";
+    this.climatePlanActions.forEach(action => {
+        csv += `${action.id},${action.title},${action.estYearlyReductionCO2Emissions},${action.startYear},${this.endYear}\n`;
+    });
+    return csv;
+}
+
+export {ClimatePlan};
