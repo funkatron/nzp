@@ -19,29 +19,134 @@
 </head>
 <body>
 <div id="app">
-    <h1>Net Zero Planner</h1>
-    <h2>{{ climatePlan.title }} ({{climatePlan.startYear}} - {{climatePlan.endYear}})</h2>
-    <b-button variant="primary" size="sm" @click="handleAddClimatePlanAction">
-        Add new action <b-icon-plus></b-icon-plus>
-    </b-button>
-    <table>
-        <tr>
-            <th>Climate Plan Action</th>
-            <th>Year</th>
-            <th>Est. CO2 Reduction/yr</th>
-            <th>Actions</th>
-        </tr>
-        <tr v-for="climatePlanAction in climatePlan.climatePlanActions">
-            <td>{{ climatePlanAction.title }}</td>
-            <td>{{ climatePlanAction.startYear }}</td>
-            <td>{{ climatePlanAction.estYearlyReductionCO2Emissions }}</td>
-            <td>
-                <b-button variant="danger" size="sm" @click="handleDeleteClimatePlanAction(climatePlanAction)">
-                    <b-icon-x></b-icon-x>
+    <b-container>
+        <b-row>
+            <b-col>
+                <h1>Net Zero Planner</h1>
+                <hr>
+            </b-col>
+        </b-row>
+
+        <b-row v-if="!showClimatePlanEditor"> <!-- Climate plan -->
+            <b-col>
+                <h2>
+                    {{ climatePlan.title }} ({{ climatePlan.startYear }} - {{ climatePlan.endYear }})
+                    <b-icon-pencil
+                        @click="handleEditClimatePlan"
+                    ></b-icon-pencil>
+                </h2>
+            </b-col>
+        </b-row>
+        <b-row v-if="showClimatePlanEditor">
+            <b-col>
+                <b-form-input v-model="climatePlan.title" size="lg"></b-form-input>
+            </b-col>
+            <b-col cols="3">
+                <b-form-select v-model="climatePlan.startYear" size="lg" :options="planYearOptions"></b-form-select>
+            </b-col>
+            <b-col cols="3">
+                <b-form-select v-model="climatePlan.endYear" size="lg" :options="planYearOptions"></b-form-select>
+            </b-col>
+            <b-col cols="3">
+                <b-button block variant="primary" size="lg" @click="handleUpdateClimatePlan">
+                    Save
+                    <b-icon-check></b-icon-check>
                 </b-button>
-            </td>
-        </tr>
-    </table>
+            </b-col>
+        </b-row>
+
+        <b-row> <!-- Climate plan projection -->
+            <b-col>
+                <b-card-group deck class="my-4">
+                    <b-card
+                        v-for="(projectionForYear, year) in projectionByYears"
+                        :key="year"
+                        :header="year"
+                        :bg-variant="projectionForYear.percentageReductionCO2Emissions < 100 ? 'danger' : 'success'"
+                        text-variant="white"
+                        header-text-variant="white"
+                        header-bg-variant="dark"
+                        no-footer
+                    >
+                        <span class="h4">
+                            {{ projectionForYear.percentageReductionCO2Emissions }}%
+                            <b-icon-arrow-down></b-icon-arrow-down>
+                        </span>
+                    </b-card>
+                </b-card-group>
+            </b-col>
+        </b-row>
+
+        <b-card header="Actions" no-body class="mt-4">
+            <template #header>
+                <b-row> <!-- Climate plan actions -->
+                    <b-col>Actions</b-col>
+                    <b-col cols="10" class="text-right">
+                        <b-button variant="primary" size="sm" @click="handleAddClimatePlanAction">
+                            Add new action
+                            <b-icon-plus></b-icon-plus>
+                        </b-button>
+                    </b-col>
+                </b-row>
+            </template>
+
+            <b-row>
+                <b-col>
+                    <b-table
+                        primary-key="id"
+                        striped
+                        :items="climatePlan.climatePlanActions"
+                        :fields="climatePlanActionFields"
+                    >
+                        <template #cell(title)="row">
+                            <b-form-input v-model="row.item.title"
+                                          @change="handleUpdateClimatePlanAction(row.item)"></b-form-input>
+                        </template>
+                        <template #cell(startYear)="row">
+                            <b-form-select v-model="row.item.startYear"
+                                           :options="actionYearOptions"
+                                           @change="handleUpdateClimatePlanAction(row.item)"></b-form-select>
+                        </template>
+                        <template #cell(estYearlyReductionCO2Emissions)="row">
+                            <b-form-input v-model="row.item.estYearlyReductionCO2Emissions" type="number"
+                                          @change="handleUpdateClimatePlanAction(row.item)"></b-form-input>
+                        </template>
+                        <template #cell(actions)="row">
+                            <div class="text-right">
+                                <b-button variant="danger" @click="handleDeleteClimatePlanAction(row.item)">
+                                    Delete
+                                    <b-icon-x></b-icon-x>
+                                </b-button>
+                            </div>
+                        </template>
+                    </b-table>
+                </b-col>
+            </b-row>
+        </b-card>
+
+        <b-card header="Export" class="mt-4">
+            <b-row> <!-- export actions -->
+                <b-col>
+                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanAsJSON">
+                        Climate Plan as JSON
+                        <b-icon-file-earmark-text></b-icon-file-earmark-text>
+                    </b-button>
+                </b-col>
+                <b-col>
+                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanAsCSV">
+                        Climate Plan as CSV
+                        <b-icon-file-earmark-text></b-icon-file-earmark-text>
+                    </b-button>
+                </b-col>
+                <b-col>
+                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanProjectionAsCSV">
+                        Climate Plan Projection as CSV
+                        <b-icon-file-earmark-text></b-icon-file-earmark-text>
+                    </b-button>
+                </b-col>
+            </b-row>
+        </b-card>
+    </b-container>
 </div>
 
 <script type="module">
@@ -49,6 +154,7 @@
     import {uuidv4} from "./util.js";
     import {ClimatePlanAction} from "./models/ClimatePlanAction.js";
     import {ClimatePlan} from "./models/ClimatePlan.js";
+    import {ClimatePlanProjection} from "./models/ClimatePlanProjection.js";
 
     const app = new Vue({
         el: '#app',
@@ -84,18 +190,81 @@
                         12000000,
                         "Increase EV adoption",
                         2027
+                    ),
+                    new ClimatePlanAction(
+                        uuidv4(),
+                        newClimatePlanId,
+                        24000000,
+                        "Increase EV adoption more",
+                        2028
+                    ),
+                    new ClimatePlanAction(
+                        uuidv4(),
+                        newClimatePlanId,
+                        24000000,
+                        "Increase EV adoption even more",
+                        2029
                     )
                 ]
             );
         },
 
+        computed: {
+            actionYearOptions: function () {
+                const years = [];
+                for (let i = this.climatePlan.startYear; i <= this.climatePlan.endYear; i++) {
+                    years.push({value: i, text: i});
+                }
+                return years;
+            },
+            planYearOptions: function () {
+                const years = [];
+                // magic numbers! - EF 2023-02-25
+                for (let i = 2022; i <= 2100; i++) {
+                    years.push({value: i, text: i});
+                }
+                return years;
+            },
+
+            projectionByYears: function () {
+                return new ClimatePlanProjection(this.climatePlan).byYears();
+            }
+        },
+
         data: {
-            climatePlan: null
+            climatePlanActionFields: [
+                {
+                    key: 'title',
+                    label: 'Title',
+                    sortable: true,
+                    sortDirection: 'desc'
+                },
+                {
+                    key: 'startYear',
+                    label: 'Start Year',
+                    sortable: true,
+                    sortDirection: 'desc'
+                },
+                {
+                    key: 'estYearlyReductionCO2Emissions',
+                    label: 'Est. CO2 Reduction/yr',
+                    sortable: true,
+                    sortDirection: 'desc'
+                },
+                {
+                    key: 'actions',
+                    label: '',
+                    sortable: false
+                }
+            ],
+            climatePlan: null,
+
+            showClimatePlanEditor: false,
         },
         watch: {
             climatePlan: {
                 handler: function (val, oldVal) {
-                    console.log("climatePlan changed: ", { val, oldVal });
+                    console.log("climatePlan changed: ", {val, oldVal});
                     console.log(this.climatePlan.serialize());
                 },
                 deep: true
@@ -113,12 +282,86 @@
                         2024
                     )
                 );
+                // set focus to the input in the new row
+                // @TODO implement this! - EF 2023-02-26
+                // this.$nextTick(() => {
+                //     const input = document.querySelector("input");
+                //     input.focus();
+                // });
+            },
+            handleUpdateClimatePlanAction: function (climatePlanAction) {
+                this.climatePlan.addOrUpdateClimatePlanAction(climatePlanAction)
             },
             handleDeleteClimatePlanAction: function (climatePlanAction) {
-                console.log("handleDeleteClimatePlanAction", { climatePlanAction });
-                this.climatePlan.climatePlanActions = this.climatePlan.climatePlanActions.filter(
-                    (cpa) => cpa.id !== climatePlanAction.id
-                );
+                console.log("handleDeleteClimatePlanAction", {climatePlanAction});
+                this.climatePlan.removeClimatePlanAction(climatePlanAction);
+            },
+            handleEditClimatePlan: function () {
+                console.log("handleEditClimatePlan");
+                this.showClimatePlanEditor = true;
+            },
+            handleUpdateClimatePlan: function () {
+                // there is really no "save" action here -- just close the editor - EF 2023-02-26
+                console.log("handleUpdateClimatePlan");
+                this.showClimatePlanEditor = false;
+            },
+
+            /**
+             * Export the Climate Plan as a JSON file, presented as a download to the user.
+             */
+            handleExportClimatePlanAsJSON: function () {
+                // create a JSON string from the ClimatePlan
+                const json = JSON.stringify(this.climatePlan.serialize(), null, 2);
+                // create a blob from the JSON string
+                const blob = new Blob([json], {type: "application/json"});
+                // create a URL for the blob
+                const url = URL.createObjectURL(blob);
+                // create a link element
+                const link = document.createElement('a');
+                // set the href of the link to the url
+                link.setAttribute('href', url);
+                // set the download attribute of the link to the filename. Use the title of the ClimatePlan and the start and end years
+                link.setAttribute('download', `${this.climatePlan.title} ${this.climatePlan.startYear}-${this.climatePlan.endYear}.json`);
+                // click the link
+                link.click();
+            },
+
+            /**
+             * Export the Climate Plan as a CSV file, presented as a download to the user.
+             */
+            handleExportClimatePlanAsCSV: function () {
+                // create a CSV string from the ClimatePlan
+                const csv = this.climatePlan.serializeAsCSV();
+                // create a blob from the CSV string
+                const blob = new Blob([csv], {type: "text/csv"});
+                // create a URL for the blob
+                const url = URL.createObjectURL(blob);
+                // create a link element
+                const link = document.createElement('a');
+                // set the href of the link to the url
+                link.setAttribute('href', url);
+                // set the download attribute of the link to the filename. Use the title of the ClimatePlan and the start and end years
+                link.setAttribute('download', `${this.climatePlan.title} ${this.climatePlan.startYear}-${this.climatePlan.endYear}.csv`);
+                // click the link
+                link.click();
+            },
+
+            // this exports the projection as a CSV file
+            handleExportClimatePlanProjectionAsCSV: function () {
+                // create a CSV string from a ClimatePlanProjection of the ClimatePlan
+                const csv = new ClimatePlanProjection(this.climatePlan).serializeAsCSV();
+                // create a blob from the CSV string
+                const blob = new Blob([csv], {type: "text/csv"});
+                // create a URL for the blob
+                const url = URL.createObjectURL(blob);
+                // create a link element
+                const link = document.createElement('a');
+                // set the href of the link to the url
+                link.setAttribute('href', url);
+                // set the download attribute of the link to the filename. Use the title of the ClimatePlan and the start and end years
+                link.setAttribute('download', `${this.climatePlan.title} Projection ${this.climatePlan.startYear}-${this.climatePlan.endYear}.csv`);
+                // click the link
+                link.click();
             }
         }
     });
