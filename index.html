@@ -16,6 +16,9 @@
 
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
 
+<!--    <script src="https://d3js.org/d3.v5.min.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.2.1/chart.min.js" integrity="sha512-v3ygConQmvH0QehvQa6gSvTE2VdBZ6wkLOlmK7Mcy2mZ0ZF9saNbbk19QeaoTHdWIEiTlWmrwAL4hS8ElnGFbA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
+
 </head>
 <body>
 <div id="app">
@@ -79,6 +82,13 @@
                         </span>
                     </b-card>
                 </b-card-group>
+            </b-col>
+        </b-row>
+
+        <b-row> <!-- visualization -->
+            <b-col>
+                <!-- Visualize percentageReductionCO2Emissions for each year -->
+<!--                <canvas id="viz" ref="viz"></canvas>-->
             </b-col>
         </b-row>
     </b-container>
@@ -216,6 +226,8 @@
                     )
                 ]
             );
+
+            this.renderVizualisation();
         },
 
         computed: {
@@ -371,6 +383,18 @@
                 link.setAttribute('download', `${this.climatePlan.title} Projection ${this.climatePlan.startYear}-${this.climatePlan.endYear}.csv`);
                 // click the link
                 link.click();
+            },
+
+            renderVizualisation() {
+                const projection = new ClimatePlanProjection(this.climatePlan).byYears();
+                console.log({projection});
+                // const years = projection.map((year) => year.year);
+                // const co2Emissions = projection.map((year) => year.co2Emissions);
+                // const co2EmissionsReduction = projection.map((year) => year.co2EmissionsReduction);
+                // const co2EmissionsReductionCumulative = projection.map((year) => year.co2EmissionsReductionCumulative);
+                // const co2EmissionsReductionCumulativePercent = projection.map((year) => year.co2EmissionsReductionCumulativePercent);
+
+                // console.log({years, co2Emissions, co2EmissionsReduction, co2EmissionsReductionCumulative, co2EmissionsReductionCumulativePercent});
             }
         }
     });
