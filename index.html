@@ -54,7 +54,9 @@
                 </b-button>
             </b-col>
         </b-row>
+    </b-container>
 
+    <b-container fluid>
         <b-row> <!-- Climate plan projection -->
             <b-col>
                 <b-card-group deck class="my-4">
@@ -76,13 +78,15 @@
                 </b-card-group>
             </b-col>
         </b-row>
+    </b-container>
 
-        <b-card header="Actions" no-body class="mt-4">
+    <b-container>
+        <b-card header="Climate Plan Actions" header-bg-variant="primary" no-body class="mt-4" header-text-variant="white">
             <template #header>
                 <b-row> <!-- Climate plan actions -->
-                    <b-col>Actions</b-col>
-                    <b-col cols="10" class="text-right">
-                        <b-button variant="primary" size="sm" @click="handleAddClimatePlanAction">
+                    <b-col>Climate Plan Actions</b-col>
+                    <b-col cols="6" class="text-right">
+                        <b-button variant="light" size="sm" @click="handleAddClimatePlanAction">
                             Add new action
                             <b-icon-plus></b-icon-plus>
                         </b-button>
