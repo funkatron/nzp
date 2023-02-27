@@ -41,13 +41,16 @@
             <b-col>
                 <b-form-input v-model="climatePlan.title" size="lg"></b-form-input>
             </b-col>
-            <b-col cols="3">
+            <b-col cols="2">
                 <b-form-select v-model="climatePlan.startYear" size="lg" :options="planYearOptions"></b-form-select>
             </b-col>
-            <b-col cols="3">
+            <b-col cols="2">
                 <b-form-select v-model="climatePlan.endYear" size="lg" :options="planYearOptions"></b-form-select>
             </b-col>
-            <b-col cols="3">
+            <b-col>
+                <b-form-input type="number" v-model="climatePlan.annualCO2Emissions" size="lg"></b-form-input>
+            </b-col>
+            <b-col cols="2">
                 <b-button block variant="primary" size="lg" @click="handleUpdateClimatePlan">
                     Save
                     <b-icon-check></b-icon-check>
