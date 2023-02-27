@@ -93,6 +93,8 @@
             <b-row>
                 <b-col>
                     <b-table
+                        responsive
+                        stacked="md"
                         primary-key="id"
                         striped
                         :items="climatePlan.climatePlanActions"
@@ -124,22 +126,22 @@
             </b-row>
         </b-card>
 
-        <b-card header="Export" class="mt-4">
+        <b-card header="Export" class="mt-4" border-variant="dark" header-bg-variant="dark" text-variant="white">
             <b-row> <!-- export actions -->
-                <b-col>
-                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanAsJSON">
+                <b-col md="4">
+                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanAsJSON" class="mb-1">
                         Climate Plan as JSON
                         <b-icon-file-earmark-text></b-icon-file-earmark-text>
                     </b-button>
                 </b-col>
-                <b-col>
-                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanAsCSV">
+                <b-col md="4">
+                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanAsCSV" class="mb-1">
                         Climate Plan as CSV
                         <b-icon-file-earmark-text></b-icon-file-earmark-text>
                     </b-button>
                 </b-col>
-                <b-col>
-                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanProjectionAsCSV">
+                <b-col md="4">
+                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanProjectionAsCSV" class="mb-1">
                         Climate Plan Projection as CSV
                         <b-icon-file-earmark-text></b-icon-file-earmark-text>
                     </b-button>
