@@ -16,8 +16,7 @@ This should open a browser window with the project running.
 - Time allocated was 4 hours, so this will be more of a prototype than a finished product.
 - To keep thinks simple, I used a single HTML file with no build process.  This is not ideal for a some projects, but it's a good way to get something up and running quickly.
 - Use technologies I know pretty well -- Vue.js and Bootstrap/BootstrapVue
-- I think building out the Models is key here, and I purposefully did this vs just making POJsOs. This will make 
-  future work that involves manipulating and aggregating data easier.
+- I think building out the Models is key here, and I purposefully did this vs just making POJsOs. This will make future work that involves manipulating and aggregating data easier.
 - Everybody always wants CSV export, so I added that. JSON is also supported.
 
 ---

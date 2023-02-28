@@ -31,7 +31,7 @@ let ClimatePlanProjection = function (climatePlan) {
         // make sure the max is 100% and min is 0%
         percentageReductionCO2Emissions = Math.min(percentageReductionCO2Emissions, 100);
         percentageReductionCO2Emissions = Math.max(percentageReductionCO2Emissions, 0);
-        this.projectionByYears[i].percentageReductionCO2Emissions =percentageReductionCO2Emissions;
+        this.projectionByYears[i].percentageReductionCO2Emissions = percentageReductionCO2Emissions;
     }
 }
 

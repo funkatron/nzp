@@ -16,8 +16,8 @@
 
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
 
-<!--    <script src="https://d3js.org/d3.v5.min.js"></script>-->
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.2.1/chart.min.js" integrity="sha512-v3ygConQmvH0QehvQa6gSvTE2VdBZ6wkLOlmK7Mcy2mZ0ZF9saNbbk19QeaoTHdWIEiTlWmrwAL4hS8ElnGFbA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
+    <script src="https://unpkg.com/frappe-charts@1.2.4/dist/frappe-charts.min.iife.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/frappe-charts@1.2.4/dist/frappe-charts.min.css"/>
 
 </head>
 <body>
@@ -33,7 +33,7 @@
         <b-row v-if="!showClimatePlanEditor"> <!-- Climate plan -->
             <b-col>
                 <h2>
-                    {{ climatePlan.title }} ({{ climatePlan.startYear }} - {{ climatePlan.endYear }})
+                    {{ climatePlan.title }} <small>({{ climatePlan.startYear }} - {{ climatePlan.endYear }})</small>
                     <b-icon-pencil
                         @click="handleEditClimatePlan"
                     ></b-icon-pencil>
@@ -63,38 +63,40 @@
     </b-container>
 
     <b-container fluid>
-        <b-row> <!-- Climate plan projection -->
-            <b-col>
-                <b-card-group deck class="my-4">
-                    <b-card
-                        v-for="(projectionForYear, year) in projectionByYears"
-                        :key="year"
-                        :header="year"
-                        :bg-variant="projectionForYear.percentageReductionCO2Emissions < 100 ? 'danger' : 'success'"
-                        text-variant="white"
-                        header-text-variant="white"
-                        header-bg-variant="dark"
-                        body-class="text-center text-nowrap"
-                    >
+        <b-card background-variant="dark">
+            <b-row> <!-- Climate plan projection -->
+                <b-col>
+                    <b-card-group deck class="my-4">
+                        <b-card
+                            v-for="(projectionForYear, year) in projectionByYears"
+                            :key="year"
+                            :header="year"
+                            :bg-variant="projectionForYear.percentageReductionCO2Emissions < 100 ? 'danger' : 'success'"
+                            text-variant="white"
+                            header-text-variant="white"
+                            header-bg-variant="dark"
+                            body-class="text-center text-nowrap"
+                        >
                         <span class="h5">
                             {{ projectionForYear.percentageReductionCO2Emissions }}%
                             <b-icon-arrow-down></b-icon-arrow-down>
                         </span>
-                    </b-card>
-                </b-card-group>
-            </b-col>
-        </b-row>
+                        </b-card>
+                    </b-card-group>
+                </b-col>
+            </b-row>
 
-        <b-row> <!-- visualization -->
-            <b-col>
-                <!-- Visualize percentageReductionCO2Emissions for each year -->
-<!--                <canvas id="viz" ref="viz"></canvas>-->
-            </b-col>
-        </b-row>
+            <b-row> <!-- visualization -->
+                <b-col>
+                    <div id="viz" ref="viz"></div>
+                </b-col>
+            </b-row>
+        </b-card>
     </b-container>
 
     <b-container>
-        <b-card header="Climate Plan Actions" header-bg-variant="primary" no-body class="mt-4" header-text-variant="white">
+        <b-card header="Climate Plan Actions" header-bg-variant="primary" no-body class="mt-4"
+                header-text-variant="white">
             <template #header>
                 <b-row> <!-- Climate plan actions -->
                     <b-col>Climate Plan Actions</b-col>
@@ -158,7 +160,8 @@
                     </b-button>
                 </b-col>
                 <b-col md="4">
-                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanProjectionAsCSV" class="mb-1">
+                    <b-button block variant="secondary" size="md" @click="handleExportClimatePlanProjectionAsCSV"
+                              class="mb-1">
                         Climate Plan Projection as CSV
                         <b-icon-file-earmark-text></b-icon-file-earmark-text>
                     </b-button>
@@ -194,14 +197,14 @@
                         newClimatePlanId,
                         7000000,
                         "Reduce deforestation",
-                        2024
+                        2025
                     ),
                     new ClimatePlanAction(
                         uuidv4(),
                         newClimatePlanId,
                         10000000,
                         "Reduce emissions from agriculture",
-                        2024
+                        2026
                     ),
                     new ClimatePlanAction(
                         uuidv4(),
@@ -227,7 +230,7 @@
                 ]
             );
 
-            this.renderVizualisation();
+            this.renderVisualization();
         },
 
         computed: {
@@ -249,6 +252,23 @@
 
             projectionByYears: function () {
                 return new ClimatePlanProjection(this.climatePlan).byYears();
+            },
+
+            visualizationData: function () {
+                const projection = this.projectionByYears;
+                return {
+                    labels: Object.keys(projection),
+                    datasets: [
+                        {
+                            name: 'percentageReductionCO2Emissions',
+                            values: Object.values(projection).map((proj) => proj.percentageReductionCO2Emissions),
+                        },
+                        // {
+                        //     name: 'netCO2Emissions',
+                        //     values: Object.values(projection).map((proj) => proj.netCO2Emissions),
+                        // }
+                    ]
+                }
             }
         },
 
@@ -287,6 +307,9 @@
                 handler: function (val, oldVal) {
                     console.log("climatePlan changed: ", {val, oldVal});
                     console.log(this.climatePlan.serialize());
+
+                    // re-render the visualization
+                    this.renderVisualization();
                 },
                 deep: true
             }
@@ -385,16 +408,20 @@
                 link.click();
             },
 
-            renderVizualisation() {
+            renderVisualization() {
                 const projection = new ClimatePlanProjection(this.climatePlan).byYears();
                 console.log({projection});
-                // const years = projection.map((year) => year.year);
-                // const co2Emissions = projection.map((year) => year.co2Emissions);
-                // const co2EmissionsReduction = projection.map((year) => year.co2EmissionsReduction);
-                // const co2EmissionsReductionCumulative = projection.map((year) => year.co2EmissionsReductionCumulative);
-                // const co2EmissionsReductionCumulativePercent = projection.map((year) => year.co2EmissionsReductionCumulativePercent);
 
-                // console.log({years, co2Emissions, co2EmissionsReduction, co2EmissionsReductionCumulative, co2EmissionsReductionCumulativePercent});
+                console.debug(this.visualizationData);
+
+                const chart = new frappe.Chart('#viz', {
+                    title: 'CO2 Emissions Reduction',
+                    data: this.visualizationData,
+                    type: 'line',
+                    height: 250,
+                    colors: ['#7cd6fd', '#743ee2'],
+                    isNavigable: 1,
+                });
             }
         }
     });
