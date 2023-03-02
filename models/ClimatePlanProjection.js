@@ -18,6 +18,8 @@ let ClimatePlanProjection = function (climatePlan) {
             netCO2Emissions: climatePlan.annualCO2Emissions,
             estYearlyReductionCO2Emissions: 0,
             cumulativeReductionCO2Emissions: 0,
+            percentageReductionCO2Emissions: 0,
+            percentageNetCO2Emissions: 100,
         };
         climatePlan.climatePlanActions.forEach((climatePlanAction) => {
             // subtract the action's estimated yearly reduction in CO2 emissions in tons
@@ -32,6 +34,10 @@ let ClimatePlanProjection = function (climatePlan) {
         percentageReductionCO2Emissions = Math.min(percentageReductionCO2Emissions, 100);
         percentageReductionCO2Emissions = Math.max(percentageReductionCO2Emissions, 0);
         this.projectionByYears[i].percentageReductionCO2Emissions = percentageReductionCO2Emissions;
+
+        // calculate the percentageNetC02Emissions as the "reverse" of percentageReductionCO2Emissions
+        let percentageNetCO2Emissions = 100 - percentageReductionCO2Emissions;
+        this.projectionByYears[i].percentageNetCO2Emissions = percentageNetCO2Emissions;
     }
 }
 

@@ -71,15 +71,14 @@
                             v-for="(projectionForYear, year) in projectionByYears"
                             :key="year"
                             :header="year"
-                            :bg-variant="projectionForYear.percentageReductionCO2Emissions < 100 ? 'danger' : 'success'"
+                            :bg-variant="projectionForYear.percentageNetCO2Emissions > 0 ? 'danger' : 'success'"
                             text-variant="white"
                             header-text-variant="white"
                             header-bg-variant="dark"
                             body-class="text-center text-nowrap"
                         >
                         <span class="h5">
-                            {{ projectionForYear.percentageReductionCO2Emissions }}%
-                            <b-icon-arrow-down></b-icon-arrow-down>
+                            {{ projectionForYear.percentageNetCO2Emissions }}%
                         </span>
                         </b-card>
                     </b-card-group>
@@ -260,8 +259,8 @@
                     labels: Object.keys(projection),
                     datasets: [
                         {
-                            name: 'percentageReductionCO2Emissions',
-                            values: Object.values(projection).map((proj) => proj.percentageReductionCO2Emissions),
+                            name: 'percentageNetCO2Emissions',
+                            values: Object.values(projection).map((proj) => proj.percentageNetCO2Emissions),
                         },
                         // {
                         //     name: 'netCO2Emissions',
@@ -415,7 +414,7 @@
                 console.debug(this.visualizationData);
 
                 const chart = new frappe.Chart('#viz', {
-                    title: 'CO2 Emissions Reduction',
+                    title: 'Net C02 emissions %',
                     data: this.visualizationData,
                     type: 'line',
                     height: 250,
