@@ -1,5 +1,7 @@
 # NZP prototype 2023-02-26
 
+> **Archived:** This repository is no longer maintained. It remains available for reference as a 2023 prototype of a Net Zero Planner web app.
+
 ## Requirements
 
 - any web server. I used [live-server](https://www.npmjs.com/package/live-server) for development.  Example usage:
